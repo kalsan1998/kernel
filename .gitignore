@@ -1,2 +1,4 @@
 *.elf
 *.img
+.vscode
+*.o
