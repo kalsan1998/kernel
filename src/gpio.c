@@ -81,7 +81,7 @@ unsigned int gpio_pup_pdn_cntrl_reg_addr(int pin)
 void set_gpfsel(int pin, int mode)
 {
     unsigned int addr = gpfsel_addr(pin);
-    volatile unsigned int sel = get(addr);
+    unsigned int sel = get(addr);
     int shift = 3 * (pin % 10);
     sel &= ~(7 << shift);
     sel |= (mode << shift);
@@ -91,7 +91,7 @@ void set_gpfsel(int pin, int mode)
 void set_gpset(int pin, int val)
 {
     unsigned int addr = gpset_addr(pin);
-    volatile unsigned int sel = get(addr);
+    unsigned int sel = get(addr);
     int shift = (pin % 32);
     sel &= ~(1 << shift);
     sel |= (val << shift);
@@ -100,7 +100,7 @@ void set_gpset(int pin, int val)
 void set_gpclr(int pin, int val)
 {
     unsigned int addr = gpclr_addr(pin);
-    volatile unsigned int sel = get(addr);
+    unsigned int sel = get(addr);
     int shift = (pin % 32);
     sel &= ~(1 << shift);
     sel |= (val << shift);
@@ -110,7 +110,7 @@ void set_gpclr(int pin, int val)
 void set_gpio_pup_pdn_cntrl(int pin, int val)
 {
     unsigned int addr = gpio_pup_pdn_cntrl_reg_addr(pin);
-    volatile unsigned int sel = get(addr);
+    unsigned int sel = get(addr);
     int shift = 2 * (pin % 16);
     sel &= ~(3 << shift);
     sel |= (val << shift);

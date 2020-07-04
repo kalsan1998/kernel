@@ -26,7 +26,7 @@ unsigned int gpset_addr(int pin);
 unsigned int gpclr_addr(int pin);
 unsigned int gpio_pup_pdn_cntrl_reg_addr(int pin);
 
-// Mode = [0,8]
+// Mode = [0,7]
 void set_gpfsel(int pin, int mode);
 void set_gpset(int pin, int val);
 void set_gpclr(int pin, int val);

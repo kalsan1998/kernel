@@ -4,6 +4,6 @@
 #define PERIPHERAL_BASE = 0xfe000000
 
 void put(unsigned int addr, int val);
-volatile unsigned int get(unsigned int addr);
+unsigned int get(unsigned int addr);
 
 #endif // COMMON_H

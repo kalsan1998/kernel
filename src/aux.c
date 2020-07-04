@@ -23,8 +23,8 @@ void init_mini_uart(void)
     // Serial port is capable of transferring max 115200 bits per second.
     // Mini UART calculates baud with:
     //      baudrate = system_clock_freq / (8 * ( baudrate_reg + 1 ))
-    //  system_clock_freq = 500 MHz
-    put(AUX_MU_BAUD_REG, 541); // Set baud rate to 115200
+    //  system_clock_freq = 700 MHz
+    put(AUX_MU_BAUD_REG, 758); // Set baud rate to 115200
 
     put(AUX_MU_CNTL_REG, 2); // Enable transmitter
 }
