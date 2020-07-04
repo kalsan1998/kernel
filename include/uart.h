@@ -12,5 +12,6 @@
 
 void init_uart(void);
 void uart_write(char c);
+char uart_read(void);
 
 #endif // UART_H

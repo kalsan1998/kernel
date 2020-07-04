@@ -31,8 +31,8 @@ void init_uart(void)
 
     // Word length is set to 8 and enables FIFO buffer.
     put(UART0_LCRH, (3 << 5) | (1 << 4));
-    // Enable Tx and UART.
-    put(UART0_CR, (1 << 8) | 1);
+    // Enable Rx and Tx and UART.
+    put(UART0_CR, (1 << 9) | (1 << 8) | 1);
 }
 
 void uart_write(char c)
@@ -42,4 +42,13 @@ void uart_write(char c)
         // Transmit FIFO is full.
     }
     put(UART0_DR, c);
+}
+
+char uart_read(void)
+{
+    while (get(UART0_FR) & (1 << 4))
+    {
+        // Receive FIFO is empty.
+    }
+    return get(UART0_DR);
 }
