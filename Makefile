@@ -1,15 +1,15 @@
-CC=arm-none-eabi-gcc
+GNU=aarch64-none-elf
 CFLAGS= \
+	-mgeneral-regs-only \
+	-ffreestanding \
 	-nostartfiles \
+	-nostdlib \
 	-O2 \
-	-mfpu=crypto-neon-fp-armv8 \
-	-mfloat-abi=hard \
-	-march=armv8-a+crc \
-	-mcpu=cortex-a72 \
-	-fPIC \
 	-I $(INCLUDE_DIR)
 ASMFLAGS= \
 	-I $(INCLUDE_DIR)
+
+LINKER=./linker.ld
 
 SRC_DIR=./src
 ASM_DIR=$(SRC_DIR)/asm
@@ -28,22 +28,22 @@ BOOT=$(SRC_DIR)/boot.c
 KERNEL=$(SRC_DIR)/kernel.c
 
 kernel: $(KERNEL) $(OBJ) $(OBJ_ASM)
-	$(CC) $(CFLAGS) $^ -o $(OUT_DIR)/client_kernel.elf
-	arm-none-eabi-objcopy $(OUT_DIR)/client_kernel.elf -O binary $(OUT_DIR)/client_kernel.img
+	$(GNU)-gcc $(CFLAGS) $^ -T $(LINKER) -o $(OUT_DIR)/client_kernel.elf
+	$(GNU)-objcopy $(OUT_DIR)/client_kernel.elf -O binary $(OUT_DIR)/client_kernel.img
 
 boot: $(BOOT) $(OBJ) $(OBJ_ASM)
-	$(CC) $(CFLAGS) $^ -o $(OUT_DIR)/boot_kernel.elf
-	arm-none-eabi-objcopy $(OUT_DIR)/boot_kernel.elf -O binary $(OUT_DIR)/boot_kernel.img
+	$(GNU)-gcc $(CFLAGS) $^ -T $(LINKER) -o $(OUT_DIR)/boot_kernel.elf
+	$(GNU)-objcopy $(OUT_DIR)/boot_kernel.elf -O binary $(OUT_DIR)/boot_kernel.img
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(GNU)-gcc $(CFLAGS) -c $< -o $@
 
 $(ASM_OBJ_DIR)/%.o: $(ASM_DIR)/%.S $(DEPS)
-	$(CC) $(ASMFLAGS) -c $< -o $@
+	$(GNU)-gcc $(ASMFLAGS) -c $< -o $@
 
 flash:
 	rm /media/kalsan/boot/kernel*.img
-	cp out/boot_kernel.img /media/kalsan/boot/kernel.img
+	cp out/boot_kernel.img /media/kalsan/boot/kernel8.img
 
 umount:
 	umount /media/kalsan/boot

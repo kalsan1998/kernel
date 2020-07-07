@@ -4,17 +4,19 @@
 #include "uart.h"
 #include "utils.h"
 
-#define KERNEL_BASE_ADDRESS 0x0
+#define KERNEL_BASE_ADDRESS 0x80000
 
 void copy_new_kernel_and_jump(void)
 {
     unsigned char *kernel = (unsigned char *)KERNEL_BASE_ADDRESS;
-    init_uart();
+
     int size = read_int();
     write_int(size);
-    int sum = 0;
     set_gpclr(42, 1);
-    for (int i = 0; i < size; ++i)
+
+    int sum = 0;
+    int i = 0;
+    for (i = 0; i < size; ++i)
     {
         char c = uart_read();
         uart_write(c);
@@ -29,6 +31,7 @@ void copy_new_kernel_and_jump(void)
 
 int main(void)
 {
+    init_uart();
     set_gpfsel(42, 1);
     set_gpset(42, 1);
     copy_new_kernel_and_jump();
