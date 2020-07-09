@@ -1,6 +1,6 @@
 
-#include "common.h"
 #include "gpio.h"
+#include "stdio.h"
 #include "uart.h"
 #include "utils.h"
 
@@ -10,22 +10,22 @@ void copy_new_kernel_and_jump(void)
 {
     unsigned char *kernel = (unsigned char *)KERNEL_BASE_ADDRESS;
 
-    int size = read_int();
-    write_int(size);
+    int size = read32();
+    write32(size);
     set_gpclr(42, 1);
 
     int sum = 0;
     int i = 0;
     for (i = 0; i < size; ++i)
     {
-        char c = uart_read();
-        uart_write(c);
+        char c = read_char();
+        print_char(c);
         sum += c;
         *kernel++ = c;
     }
     set_gpset(42, 1);
-    write_int(sum);
-
+    write32(sum);
+    read_char();
     branch_to_address((void *)KERNEL_BASE_ADDRESS);
 }
 

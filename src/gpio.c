@@ -1,6 +1,6 @@
 #include "gpio.h"
 
-#include "common.h"
+#include "utils.h"
 
 unsigned int gpfsel_addr(int pin)
 {

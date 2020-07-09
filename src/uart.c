@@ -1,7 +1,7 @@
 #include "uart.h"
 
-#include "common.h"
 #include "gpio.h"
+#include "utils.h"
 
 void init_uart(void)
 {

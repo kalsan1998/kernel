@@ -72,6 +72,8 @@ sum_confirmation = int.from_bytes(serial.read(4), byteorder='big')
 if sum_confirmation != checksum:
     print('Expected checksum ', checksum, ' but got ', sum_confirmation)
     # exit(1)
+print('Sending ready.')
+ready = 0
+serial.write(ready.to_bytes(1, byteorder='big'))
 print('SUCCESS')
-
 exit(0)
