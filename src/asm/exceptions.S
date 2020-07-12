@@ -13,9 +13,32 @@ current_el:
 	lsr x0, x0, #2		// Shift those bits right
 	ret
 
+.global exception_class_el3
+exception_class_el3:
+    mrs x0, esr_el3
+    lsr x0, x0, #26     // Want bits [26,31]
+    and x0, x0, #32
+    ret
+    
 .global fault_status_code_el3
 fault_status_code_el3:
     mrs x0, esr_el3
     and x0, x0, #63     // Bits [0,5]
     ret
 
+.global fault_address_el3
+fault_address_el3:
+    mrs x0, far_el3     // 64bit
+    ret
+
+.global instruction_fault_address
+instruction_fault_address:
+    mrs x0, far_el2
+    and x0, x0, #0xffffffff // First 32 bits
+    ret
+
+.global data_fault_address
+data_fault_address:
+    mrs x0, far_el2
+    lsr x0, x0, #32     // Last 32 bits
+    ret

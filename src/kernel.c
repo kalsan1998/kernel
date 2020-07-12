@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "uart.h"
 
-void show_input(void)
+void show_input32(void)
 {
     print_string("Input:\r\n");
     while (1)
@@ -74,6 +74,6 @@ int main(void)
     read_char();
     print_current_exception_level();
     print_string("--------\r\n");
-    show_input();
+    show_input32();
     return 0;
 }

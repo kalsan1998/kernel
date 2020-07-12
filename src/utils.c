@@ -2,14 +2,14 @@
 
 #include "uart.h"
 
-void put(unsigned int addr, int val)
+void put32(uint32_t addr, uint32_t val)
 {
-    *((volatile unsigned int *)addr) = val;
+    *((volatile uint32_t *)addr) = val;
 }
 
-unsigned int get(unsigned int addr)
+uint32_t get32(uint32_t addr)
 {
-    return *((volatile unsigned int *)addr);
+    return *((volatile uint32_t *)addr);
 }
 
 int read32(void)

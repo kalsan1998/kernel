@@ -3,6 +3,18 @@
 #include "gpio.h"
 #include "utils.h"
 
+#define AUX_BASE 0xfe215000
+
+#define AUX_ENABLES 0xfe215004
+#define AUX_MU_IO_REG 0xfe215040
+#define AUX_MU_IER_REG 0xfe215044
+#define AUX_MU_IIR_REG 0xfe215048
+#define AUX_MU_LCR_REG 0xfe21504c
+#define AUX_MU_MCR_REG 0xfe215050
+#define AUX_MU_LSR_REG 0xfe215054
+#define AUX_MU_CNTL_REG 0xfe215060
+#define AUX_MU_BAUD_REG 0xfe215068
+
 void init_mini_uart(void)
 {
     // Mini UART -> UART1
@@ -14,27 +26,27 @@ void init_mini_uart(void)
     set_gpio_pup_pdn_cntrl(15, 0);
 
     // From: https://s-matyukevich.github.io/raspberry-pi-os/docs/lesson01/rpi-os.html
-    put(AUX_ENABLES, 1);     // enables mini UART
-    put(AUX_MU_IER_REG, 0);  // Disable receive and transmit interrupts
-    put(AUX_MU_CNTL_REG, 0); // Disable auto flow control and disable receiver and transmitter
-    put(AUX_MU_LCR_REG, 1);  // Enable 8 bit mode
-    put(AUX_MU_MCR_REG, 0);  // Set RTS line to be always high since we don't need it
-    put(AUX_MU_IIR_REG, 7);  // Clears FIFO and sets no interrupt pending
+    put32(AUX_ENABLES, 1);     // enables mini UART
+    put32(AUX_MU_IER_REG, 0);  // Disable receive and transmit interrupts
+    put32(AUX_MU_CNTL_REG, 0); // Disable auto flow control and disable receiver and transmitter
+    put32(AUX_MU_LCR_REG, 1);  // Enable 8 bit mode
+    put32(AUX_MU_MCR_REG, 0);  // Set RTS line to be always high since we don't need it
+    put32(AUX_MU_IIR_REG, 7);  // Clears FIFO and sets no interrupt pending
     // Serial port is capable of transferring max 115200 bits per second.
     // Mini UART calculates baud with:
     //      baudrate = system_clock_freq / (8 * ( baudrate_reg + 1 ))
     //  system_clock_freq = 500 MHz
-    put(AUX_MU_BAUD_REG, 270); // Set baud rate to 115200
+    put32(AUX_MU_BAUD_REG, 270); // Set baud rate to 115200
 
-    put(AUX_MU_CNTL_REG, 2); // Enable transmitter
+    put32(AUX_MU_CNTL_REG, 2); // Enable transmitter
 }
 
 void mini_uart_write(char c)
 {
     while (1)
     {
-        if (get(AUX_MU_LSR_REG) & 0x20)
+        if (get32(AUX_MU_LSR_REG) & 0x20)
             break;
     }
-    put(AUX_MU_IO_REG, c);
+    put32(AUX_MU_IO_REG, c);
 }

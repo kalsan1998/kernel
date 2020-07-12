@@ -3,7 +3,6 @@ CFLAGS= \
 	-mgeneral-regs-only \
 	-ffreestanding \
 	-nostartfiles \
-	-nostdlib \
 	-O2 \
 	-I $(INCLUDE_DIR)
 ASMFLAGS= \
