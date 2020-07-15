@@ -20,11 +20,12 @@ ASM_OBJ_DIR=$(OBJ_DIR)/asm
 DEPS:=$(wildcard $(INCLUDE_DIR)/*.h)
 SRC:=$(wildcard $(SRC_DIR)/*.c)
 ASM:=$(wildcard $(ASM_DIR)/*.S)
-OBJ:=$(DEPS:$(INCLUDE_DIR)/%.h=$(OBJ_DIR)/%.o)
+OBJ:=$(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJ_ASM:=$(ASM:$(ASM_DIR)/%.S=$(ASM_OBJ_DIR)/%.o)
 
-BOOT=$(SRC_DIR)/boot.c
-KERNEL=$(SRC_DIR)/kernel.c
+
+BOOT=$(SRC_DIR)/main/boot.c
+KERNEL=$(SRC_DIR)/main/kernel.c
 
 kernel: $(KERNEL) $(OBJ) $(OBJ_ASM)
 	$(GNU)-gcc $(CFLAGS) $^ -T $(LINKER) -o $(OUT_DIR)/client_kernel.elf

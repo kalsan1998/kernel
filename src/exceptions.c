@@ -38,32 +38,26 @@
 #define FLOAT_POINT_64 0x2c
 #define SERROR_INTERRUPT 0x2f
 
-extern int exception_class_el3(void);
-extern int fault_status_code_el3(void);
-extern uint64_t fault_address_el3(void);
-extern uint32_t instruction_fault_address(void);
-extern uint32_t data_fault_address(void);
+extern int exception_class_el1(void);
+extern int fault_status_code_el1(void);
+extern uint64_t fault_address_el1(void);
+extern uint64_t instruction_link_el1(void);
 
 void handle_exception(void)
 {
-    uint64_t fault_address = fault_address_el3();
-    uint32_t ifa = instruction_fault_address();
-    uint32_t dfa = data_fault_address();
-    int exception_class = exception_class_el3();
-    int fault_status = fault_status_code_el3();
-
     print_string("-- Handling Exception -- \r\n");
+
+    uint64_t fault_address = fault_address_el1();
+    uint64_t instruction_address = instruction_link_el1();
+    int exception_class = exception_class_el1();
+    int fault_status = fault_status_code_el1();
+
+    print_string("Instruction Address: ");
+    print_hex(instruction_address, 8);
+    print_string("\r\n");
 
     print_string("Fault Address: ");
     print_hex(fault_address, 8);
-    print_string("\r\n");
-
-    print_string("Instruction Fault Address: ");
-    print_hex(ifa, 8);
-    print_string("\r\n");
-
-    print_string("Data Fault Address: ");
-    print_hex(dfa, 8);
     print_string("\r\n");
 
     print_string("Exception Class: ");
@@ -113,11 +107,11 @@ void handle_exception(void)
     }
 }
 
-int force_exception(void)
+void force_exception(void)
 {
     print_string("Forcing exception\r\n");
     print_string("--------\r\n");
     // Unaligned access
     volatile int what = *((uint64_t *)0x03);
-    return what;
+    // asm volatile("svc #0");
 }
