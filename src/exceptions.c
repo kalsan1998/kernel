@@ -46,7 +46,7 @@ extern uint64_t instruction_link_el1(void);
 void handle_exception(void)
 {
     print_string("-- Handling Exception -- \r\n");
-
+    print_current_exception_level();
     uint64_t fault_address = fault_address_el1();
     uint64_t instruction_address = instruction_link_el1();
     int exception_class = exception_class_el1();
@@ -95,6 +95,9 @@ void handle_exception(void)
     print_string(" - ");
     switch (fault_status)
     {
+    case ADDR_SIZE_FAULT:
+        print_string("Address Size Fault\r\n");
+        break;
     case ALIGNMENT_FAULT:
         print_string("Alignment Fault\r\n");
         break;
@@ -102,8 +105,30 @@ void handle_exception(void)
         print_string("Not Handled\r\n");
     }
     print_string("--------\r\n");
-    while (1)
+}
+
+void print_current_exception_level(void)
+{
+    int el = current_el();
+    print_string("Current Exception Level: ");
+    switch (el)
     {
+    case 0:
+        print_string("EL0 -- Applications\r\n");
+        break;
+    case 1:
+        print_string("EL1 -- OS kernel functions (privileged)\r\n");
+        break;
+    case 2:
+        print_string("EL2 -- Hypervisor\r\n");
+        break;
+    case 3:
+        print_string("EL3 -- Secure monitor\r\n");
+        break;
+    default:
+        print_string("EL");
+        print_int(el);
+        print_string("-- Unknown\r\n");
     }
 }
 
@@ -114,4 +139,7 @@ void force_exception(void)
     // Unaligned access
     volatile int what = *((uint64_t *)0x03);
     // asm volatile("svc #0");
+    // svc: EL0 -> EL1
+    // hvc: EL1 -> EL2
+    // smc: EL1/EL2 -> EL3
 }

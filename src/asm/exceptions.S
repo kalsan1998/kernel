@@ -72,8 +72,6 @@ el3_to_el1:
 	mov x0, #0x400000 // 4MB
     msr sp_el1, x0 
 
-
-
     adr x0, el1_entry
     msr elr_el3, x0 // Address to return to after eret
     

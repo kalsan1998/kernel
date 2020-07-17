@@ -1,5 +1,6 @@
 #include "timer.h"
 
+#include "interrupts.h"
 #include "stdio.h"
 #include "utils.h"
 
@@ -12,18 +13,27 @@
 #define C2 SYSTEM_TIMER_BASE + 0x14  // Compare 2
 #define C3 SYSTEM_TIMER_BASE + 0x18  // Compare 3
 
+// https://www.raspberrypi.org/forums/viewtopic.php?f=72&t=17855
+// Timer 0 is used for the GPU RTOS (threadx) as the timer tick (100 interrupts / second).
+// Timer 2 is used for lightweight timers than can call callbacks with microsecond (*) resolution.
+
 // Currently just use C1
+void enable_timer_irq(void)
+{
+    // From Table 100 (pg 108), Timer1 is VideoCore interrupt 1
+    enable_vc_interrupt(1);
+}
 
 void start_timer(uint32_t micro)
 {
     print_string("Setting timer for ");
     print_int(micro / 1000);
     print_string("ms\r\n");
-    put32(C3, get32(CLO) + micro);
+    put32(C1, get32(CLO) + micro);
 }
 
 void handle_timer_irq(void)
 {
     print_string("Timer!\r\n");
-    put32(CS, 8); // Clears C1
+    put32(CS, (1 << 1)); // Clears C1 (IRQ0_PENDING is cleared)
 }
