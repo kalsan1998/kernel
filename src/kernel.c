@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "interrupts.h"
 #include "stdio.h"
+#include "threads.h"
 #include "timer.h"
 #include "uart.h"
 
@@ -55,7 +56,25 @@ void el1_main(void)
     enable_timer_irq();
     enable_irq();
     print_current_exception_level();
-    show_input();
+
+    // int err = new_thread(&show_input, 0);
+    // if (err)
+    // {
+    //     print_string("Error starting thread 1\r\n");
+    // }
+
+    // err = new_thread(&thread_entry, "Number1\r\n");
+    // if (err)
+    // {
+    //     print_string("Error starting thread 2\r\n");
+    // }
+}
+
+void thread_entry(const char *msg)
+{
+    print_string(msg);
+    while (1)
+        ;
 }
 
 int main(void)

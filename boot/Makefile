@@ -24,34 +24,23 @@ ASM:=$(wildcard $(ASM_DIR)/*.S)
 OBJ:=$(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJ_ASM:=$(ASM:$(ASM_DIR)/%.S=$(ASM_OBJ_DIR)/%.o)
 
-kernel: $(OBJ) $(OBJ_ASM)
-	$(GNU)-gcc $(CFLAGS) $^ -T $(LINKER) -o $(OUT_DIR)/client_kernel.elf
-	$(GNU)-objcopy $(OUT_DIR)/client_kernel.elf -O binary $(OUT_DIR)/client_kernel.img
 
-.PHONY: boot
-boot:
-	$(MAKE) -C $(BOOT_DIR)
+
+boot: $(OBJ) $(OBJ_ASM)
+	$(GNU)-gcc $(CFLAGS) $^ -T $(LINKER) -o $(OUT_DIR)/boot_kernel.elf
+	$(GNU)-objcopy $(OUT_DIR)/boot_kernel.elf -O binary $(OUT_DIR)/boot_kernel.img
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 	$(GNU)-gcc $(CFLAGS) -c $< -o $@
 
 $(ASM_OBJ_DIR)/%.o: $(ASM_DIR)/%.S $(DEPS)
 	$(GNU)-gcc $(ASMFLAGS) -c $< -o $@
-
-flash:
-	rm /media/kalsan/boot/kernel*.img
-	cp $(BOOT_DIR)/out/boot_kernel.img /media/kalsan/boot/kernel8.img
-
-umount:
-	umount /media/kalsan/boot
-	umount /media/kalsan/rootfs
-
+	
 .PHONY: clean
 
 clean:
 	rm -f $(ASM_OBJ_DIR)/*o
 	rm -f $(OBJ_DIR)/*.o
 	rm -f $(OUT_DIR)/*
-	$(MAKE) -C $(BOOT_DIR) clean
 
 	

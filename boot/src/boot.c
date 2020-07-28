@@ -1,10 +1,9 @@
 
 #include "gpio.h"
-#include "stdio.h"
 #include "uart.h"
 #include "utils.h"
 
-#define KERNEL_BASE_ADDRESS 0x80000
+#define KERNEL_BASE_ADDRESS 0x1000 // 4KB
 
 void copy_new_kernel_and_jump(void)
 {
@@ -18,14 +17,14 @@ void copy_new_kernel_and_jump(void)
     int i = 0;
     for (i = 0; i < size; ++i)
     {
-        char c = read_char();
-        print_char(c);
+        char c = uart_read();
+        uart_write(c);
         sum += c;
         *kernel++ = c;
     }
     set_gpset(42, 1);
     write32(sum);
-    read_char();
+    uart_read();
     branch_to_address((void *)KERNEL_BASE_ADDRESS);
 }
 
