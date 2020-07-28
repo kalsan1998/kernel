@@ -9,6 +9,8 @@ TODO:
     - Threads
         - Use better way of allocating space for thread
         - Priority for threads
+        - Threads have trouble passing string literals as arguments. Something weird happens with
+          read-only memory. Pointers still work.
 - Locks
 - Virtual Memory
 - Graphics
@@ -28,6 +30,7 @@ Things I learned:
 - esr_eln (exception syndrome) only updated for SError. GIC is for IRQ/FIQ.
 - DAIF masks are automatically set to prevent further interrupts. Therefore need must reset daif
 allow nested interrupts.
+- Threads have their own space allocated for stacks.
 
 
 Memory:

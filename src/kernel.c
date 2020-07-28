@@ -51,6 +51,22 @@ void blink_light(void)
     }
 }
 
+struct msg
+{
+    char *d;
+};
+
+struct msg test = {};
+
+void thread_entry(struct msg *t)
+// void thread_entry(uint64_t f)
+{
+    print_char(t->d[1]);
+
+    while (1)
+        ;
+}
+
 void el1_main(void)
 {
     enable_timer_irq();
@@ -58,23 +74,16 @@ void el1_main(void)
     print_current_exception_level();
 
     // int err = new_thread(&show_input, 0);
-    // if (err)
+    // if (err != 0)
     // {
     //     print_string("Error starting thread 1\r\n");
     // }
-
-    // err = new_thread(&thread_entry, "Number1\r\n");
-    // if (err)
-    // {
-    //     print_string("Error starting thread 2\r\n");
-    // }
-}
-
-void thread_entry(const char *msg)
-{
-    print_string(msg);
-    while (1)
-        ;
+    test.d = "hello";
+    int err = new_thread((uint64_t)&thread_entry, (uint64_t)&test);
+    if (err)
+    {
+        print_string("Error starting thread 2\r\n");
+    }
 }
 
 int main(void)
@@ -82,6 +91,8 @@ int main(void)
     init_uart();
     read_char();
     init_vector_tables();
+    init_threads();
+
     print_current_exception_level();
     if (current_el() != 1)
     {
