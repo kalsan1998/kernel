@@ -2,6 +2,7 @@
 
 #include "interrupts.h"
 #include "stdio.h"
+#include "threads.h"
 #include "utils.h"
 
 #define SYSTEM_TIMER_BASE 0xfe003000
@@ -22,9 +23,10 @@ void enable_timer_irq(void)
 {
     // From Table 100 (pg 108), Timer1 is VideoCore interrupt 1
     enable_vc_interrupt(1);
+    enable_vc_interrupt(3);
 }
 
-void start_timer(uint32_t micro)
+void start_timer1(uint32_t micro)
 {
     print_string("Setting timer for ");
     print_int(micro / 1000);
@@ -32,8 +34,23 @@ void start_timer(uint32_t micro)
     put32(C1, get32(CLO) + micro);
 }
 
-void handle_timer_irq(void)
+void handle_timer1_irq(void)
 {
     print_string("Timer!\r\n");
     put32(CS, (1 << 1)); // Clears C1 (IRQ0_PENDING is cleared)
+}
+
+uint32_t interval;
+// Timer3 is for loops
+void set_timer3_loop_interval(uint32_t micro)
+{
+    interval = micro;
+    put32(C3, get32(CLO) + micro);
+}
+
+void handle_timer3_irq(void)
+{
+    put32(CS, (1 << 3));
+    put32(C3, get32(CLO) + interval);
+    timer_tick();
 }

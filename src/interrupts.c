@@ -34,18 +34,23 @@ void enable_vc_interrupt(int interrupt_number)
     {
         address = IRQ0_SET_EN_1;
     }
-    put32(address, get32(address) | (1 << interrupt_number));
+    put32(address, get32(address) | (1 << (interrupt_number % 32)));
 }
 
 void handle_irq(void)
 {
-    print_string("-- Handling Interrupt -- \r\n");
+    int handled = 0;
     if (get32(IRQ0_PENDING0) & (1 << 1))
     {
-        print_string("Timer1 Interrupt Type\r\n");
-        handle_timer_irq();
+        handle_timer1_irq();
+        handled = 1;
     }
-    else
+    if (get32(IRQ0_PENDING0) & (1 << 3))
+    {
+        handle_timer3_irq();
+        handled = 1;
+    }
+    if (handled == 0)
     {
         print_string("Unknown Interrupt Type\r\n");
     }

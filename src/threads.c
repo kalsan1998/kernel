@@ -28,21 +28,35 @@ struct thread
     uint64_t sp;
 
     int id;
-    int state;
     uint64_t base;
+    int preempt_enabled;
+    int timer_count;
 };
 
+// TODO: Store pointers to address instead.
 struct thread threads[MAX_THREADS];
-int curr = -1;
+int curr = 0;
+
+void enable_preempt(void)
+{
+    threads[curr].preempt_enabled = 1;
+}
+void disable_preempt(void)
+{
+    threads[curr].preempt_enabled = 0;
+}
 
 void init_threads(void)
 {
     int i;
     for (i = 0; i < MAX_THREADS; ++i)
     {
-        threads[i].state = 0;
+        threads[i].id = -1;
         threads[i].base = THREAD_SPACE_START + (i * THREAD_STACK_SIZE);
+        threads[i].timer_count = 0;
+        threads[i].preempt_enabled = 1;
     }
+    threads[curr].id = curr;
 }
 
 int new_thread(uint64_t entry, uint64_t arg)
@@ -53,17 +67,22 @@ int new_thread(uint64_t entry, uint64_t arg)
         return -1;
     }
     struct thread *new_thread = &threads[id];
+    new_thread->timer_count = 1;
+    new_thread->preempt_enabled = 0;
     new_thread->x19 = entry;
     new_thread->x20 = arg;
     new_thread->pc = (uint64_t)new_thread_start;
     new_thread->sp = new_thread->base + THREAD_STACK_SIZE;
-
-    switch_thread(id);
     return 0;
 }
 
 void switch_thread(int id)
 {
+    print_string("Attempting thread switch (");
+    print_int(curr);
+    print_string(" to ");
+    print_int(id);
+    print_string(")\r\n");
     if (id == curr)
     {
         return;
@@ -75,20 +94,63 @@ void switch_thread(int id)
     print_string("switch_thread() - Shold not get here.");
 }
 
-// switch thread:
-// store current thread registers on stack, load next threads registers from stack
-
 int reserve_thread(void)
 {
     int i;
     for (i = 0; i < MAX_THREADS; ++i)
     {
-        if (threads[i].state == 0)
+        if (threads[i].id == -1)
         {
-            threads[i].state = 1;
             threads[i].id = i;
             return i;
         }
     }
     return -1;
+}
+
+void schedule_next_thread()
+{
+    while (1)
+    {
+        int next_thread_id = -1;
+        int max_count = 0;
+        int i;
+        for (i = 0; i < MAX_THREADS; ++i)
+        {
+            if (threads[i].id != -1 && threads[i].timer_count > max_count)
+            {
+                max_count = threads[i].timer_count;
+                next_thread_id = i;
+            }
+        }
+        if (next_thread_id != -1)
+        {
+            switch_thread(next_thread_id);
+            return;
+        }
+        for (i = 0; i < MAX_THREADS; ++i)
+        {
+            if (threads[i].id != -1)
+            {
+                threads[i].timer_count++;
+            }
+        }
+    }
+}
+
+void timer_tick(void)
+{
+    struct thread current_thread = threads[curr];
+    print_int(current_thread.timer_count);
+    print_string(" -- ");
+    print_int(current_thread.preempt_enabled);
+    if (--current_thread.timer_count <= 0 && current_thread.preempt_enabled == 1)
+    {
+        disable_preempt();
+        enable_irq();
+        schedule_next_thread();
+        // When we come back to this thread then returns here.
+        disable_irq();
+        enable_preempt();
+    }
 }

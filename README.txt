@@ -11,6 +11,7 @@ TODO:
         - Priority for threads
         - Threads have trouble passing string literals as arguments. Something weird happens with
           read-only memory. Pointers still work.
+        - Attach scheduler to ARM Timer instead of System Timer
 - Locks
 - Virtual Memory
 - Graphics
@@ -19,6 +20,7 @@ TODO:
     - Add reg dump for debug
     - String utils
     - Get mini uart to work
+    - Add callbacks for timer
 
 Things I learned:
 - Byte addressing -> Each address points to one byte :: 2^32 bits -> 4GB

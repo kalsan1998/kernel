@@ -7,7 +7,7 @@ void print_char(char c);
 char read_char(void);
 
 void print_string(const char *s);
-void print_int(uint64_t n);
+void print_int(int64_t n);
 
 void print_hex(uint64_t n, int nybbles);
 

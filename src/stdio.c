@@ -22,8 +22,13 @@ void print_string(const char *s)
     }
 }
 
-void print_int(uint64_t n)
+void print_int(int64_t n)
 {
+    if (n < 0)
+    {
+        print_char('-');
+        n *= -1;
+    }
     if (n == 0)
     {
         print_char('0');

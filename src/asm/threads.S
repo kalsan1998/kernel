@@ -28,5 +28,6 @@ context_switch:
 
 .global new_thread_start
 new_thread_start:
+	bl enable_preempt
     mov x0, x20
     blr x19
