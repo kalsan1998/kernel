@@ -3,6 +3,8 @@
 
 #include "stdint.h"
 
+extern int curr_thread_id;
+
 void init_threads(void);
 int new_thread(uint64_t entry, uint64_t arg);
 void enable_preempt(void);

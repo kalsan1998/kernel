@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include "stdio.h"
 #include "uart.h"
 
 void put32(uint32_t addr, uint32_t val)
@@ -28,4 +29,12 @@ void write32(int number)
     uart_write((char)((number >> 16) & 0xFF));
     uart_write((char)((number >> 8) & 0xFF));
     uart_write((char)(number & 0xFF));
+}
+
+uint64_t print_sp()
+{
+    register uint64_t val asm("sp");
+    print_string("sp: ");
+    print_hex(val, 8);
+    print_string("\r\n");
 }

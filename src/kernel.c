@@ -6,6 +6,17 @@
 #include "timer.h"
 #include "uart.h"
 
+void thread_entry(const int id)
+{
+    print_string("Inside thread ");
+    print_int(id);
+    print_string("\r\n");
+    while (1)
+    {
+        print_int(id);
+    }
+}
+
 void show_input(void)
 {
     print_string("Input:\r\n");
@@ -23,6 +34,24 @@ void show_input(void)
         else if (c == '!')
         {
             start_timer1(5000000);
+        }
+        else if (c == '@')
+        {
+            int err = new_thread(&thread_entry, 1);
+            if (err != 0)
+            {
+                print_string("Error starting thread 1\r\n");
+            }
+            err = new_thread(&thread_entry, 2);
+            if (err != 0)
+            {
+                print_string("Error starting thread 2\r\n");
+            }
+            err = new_thread(&thread_entry, 3);
+            if (err != 0)
+            {
+                print_string("Error starting thread 3\r\n");
+            }
         }
         else
         {
@@ -51,33 +80,16 @@ void blink_light(void)
     }
 }
 
-void thread_entry(char c)
-{
-    print_char(c);
-    print_string("Inside new thread\r\n");
-    while (1)
-        ;
-}
-
 void el1_main(void)
 {
     enable_timer_irq();
     enable_irq();
     init_threads();
     print_current_exception_level();
-    set_timer3_loop_interval(5000000); //1ms
-    int err = new_thread(&show_input, 0);
-    if (err != 0)
-    {
-        print_string("Error starting thread 1\r\n");
-    }
+    set_timer3_loop_interval(100000); //100ms
+    show_input();
     while (1)
         ;
-    // int err = new_thread((uint64_t)&thread_entry, 'g');
-    // if (err)
-    // {
-    //     print_string("Error starting thread 2\r\n");
-    // }
 }
 
 int main(void)

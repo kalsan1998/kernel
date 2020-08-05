@@ -1,5 +1,6 @@
 #include "threads.h"
 
+#include "utils.h"
 #include "stdio.h"
 
 #define THREAD_SPACE_START 0x004000000 // give 4MB for kernel img
@@ -35,15 +36,15 @@ struct thread
 
 // TODO: Store pointers to address instead.
 struct thread threads[MAX_THREADS];
-int curr = 0;
+int curr_thread_id = 0;
 
 void enable_preempt(void)
 {
-    threads[curr].preempt_enabled = 1;
+    threads[curr_thread_id].preempt_enabled = 1;
 }
 void disable_preempt(void)
 {
-    threads[curr].preempt_enabled = 0;
+    threads[curr_thread_id].preempt_enabled = 0;
 }
 
 void init_threads(void)
@@ -56,14 +57,16 @@ void init_threads(void)
         threads[i].timer_count = 0;
         threads[i].preempt_enabled = 1;
     }
-    threads[curr].id = curr;
+    threads[curr_thread_id].id = curr_thread_id;
 }
 
 int new_thread(uint64_t entry, uint64_t arg)
 {
+    disable_preempt();
     int id = reserve_thread();
     if (id == -1)
     {
+        enable_preempt();
         return -1;
     }
     struct thread *new_thread = &threads[id];
@@ -73,25 +76,20 @@ int new_thread(uint64_t entry, uint64_t arg)
     new_thread->x20 = arg;
     new_thread->pc = (uint64_t)new_thread_start;
     new_thread->sp = new_thread->base + THREAD_STACK_SIZE;
+    enable_preempt();
+
     return 0;
 }
 
 void switch_thread(int id)
 {
-    print_string("Attempting thread switch (");
-    print_int(curr);
-    print_string(" to ");
-    print_int(id);
-    print_string(")\r\n");
-    if (id == curr)
+    if (id == curr_thread_id)
     {
         return;
     }
-    int old_curr = curr;
-    curr = id;
-    context_switch(&threads[old_curr], &threads[curr]);
-
-    print_string("switch_thread() - Shold not get here.");
+    int old_curr_thread_id = curr_thread_id;
+    curr_thread_id = id;
+    context_switch(&threads[old_curr_thread_id], &threads[curr_thread_id]);
 }
 
 int reserve_thread(void)
@@ -140,11 +138,8 @@ void schedule_next_thread()
 
 void timer_tick(void)
 {
-    struct thread current_thread = threads[curr];
-    print_int(current_thread.timer_count);
-    print_string(" -- ");
-    print_int(current_thread.preempt_enabled);
-    if (--current_thread.timer_count <= 0 && current_thread.preempt_enabled == 1)
+    struct thread *current_thread = &threads[curr_thread_id];
+    if (--current_thread->timer_count <= 0 && current_thread->preempt_enabled == 1)
     {
         disable_preempt();
         enable_irq();

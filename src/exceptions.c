@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+#include "threads.h"
 #include "stdio.h"
 
 // Fault status codes
@@ -43,9 +44,18 @@ extern int fault_status_code_el1(void);
 extern uint64_t fault_address_el1(void);
 extern uint64_t instruction_link_el1(void);
 
-void handle_exception(void)
+void handle_exception(uint64_t lr)
 {
     print_string("-- Handling Exception -- \r\n");
+
+    print_string("Current thread id: ");
+    print_int(curr_thread_id);
+    print_string("\r\n");
+
+    print_string("lr: ");
+    print_hex(lr, 8);
+    print_string("\r\n");
+
     print_current_exception_level();
     uint64_t fault_address = fault_address_el1();
     uint64_t instruction_address = instruction_link_el1();

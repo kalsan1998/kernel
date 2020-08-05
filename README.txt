@@ -5,16 +5,16 @@ TODO:
 - Exceptions
     - Pass CurrentEL to basic handler and apply operations from there
     - Change EL from EL3 to EL2 and EL2 to EL1
-- Processes/Threads
+- Threads
     - Threads
         - Use better way of allocating space for thread
-        - Priority for threads
-        - Threads have trouble passing string literals as arguments. Something weird happens with
-          read-only memory. Pointers still work.
         - Attach scheduler to ARM Timer instead of System Timer
-- Locks
+        - Improve scheduler -> CFS pick thread with smalled vrruntime (add priorities)
+        - Thread exit/join
 - Virtual Memory
 - Graphics
+- Locks
+- Process forking + IPC
 
 - Other
     - Add reg dump for debug
