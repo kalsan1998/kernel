@@ -1,10 +1,12 @@
 #include "exceptions.h"
 #include "gpio.h"
 #include "interrupts.h"
+#include "mm.h"
 #include "stdio.h"
 #include "threads.h"
 #include "timer.h"
 #include "uart.h"
+#include "virtual_memory.h"
 
 void thread_entry(const int id)
 {
@@ -84,9 +86,11 @@ void el1_main(void)
 {
     enable_timer_irq();
     enable_irq();
-    init_threads();
+    //init_threads();
     print_current_exception_level();
-    set_timer3_loop_interval(100000); //100ms
+    print_hex(test_el1_translation(0xffff000000001234), 16);
+    print_hex(test_el1_translation(0xffff0000fe205000), 16);
+    //set_timer3_loop_interval(100000); //100ms
     show_input();
     while (1)
         ;

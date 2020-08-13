@@ -5,12 +5,22 @@
 
 void put32(uint32_t addr, uint32_t val)
 {
-    *((volatile uint32_t *)addr) = val;
+    (*((volatile uint32_t *)addr) = val);
 }
 
 uint32_t get32(uint32_t addr)
 {
-    return *((volatile uint32_t *)addr);
+    return (*((volatile uint32_t *)addr));
+}
+
+void put64(uint64_t addr, uint64_t val)
+{
+    (*((volatile uint64_t *)addr) = val);
+}
+
+uint64_t get64(uint64_t addr)
+{
+    return (*((volatile uint64_t *)addr));
 }
 
 int read32(void)

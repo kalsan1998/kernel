@@ -1,29 +1,54 @@
+#include "mm.h"
+#include "virtual_memory.h"
+
 .section ".text.boot"
  
 .globl _start
  
 _start:
-	mrs	x0, mpidr_el1		
-	and	x0, x0,#0xFF		// Check processor id
-	cbz	x0, 2f		// Hang for all non-primary CPU
-	b	halt
- 
-    // set stack before our code
-2: ldr     x5, =_start
+    ldr     x5, =_start
     mov     sp, x5
 
     // clear bss
-    ldr     x5, =__bss_start
-    ldr     w6, =__bss_size
-3:  cbz     w6, 4f
-    str     xzr, [x5], #8
-    sub     w6, w6, #1
-    cbnz    w6, 3b
- 
-    // jump to C code, should not return
-4:  bl      main
+    ldr x0, =bss_start
+    ldr x1, =bss_end
+    sub x1, x1, x0
+    bl memzero
+
+    bl main
     b halt
 
 halt:
 	wfe
 	b halt
+
+.globl el1_entry
+el1_entry:
+	adr	x0, bss_start
+	adr	x1, bss_end
+	sub	x1, x1, x0
+	bl 	memzero
+
+	bl 	init_page_tables
+
+//	mov	x0, #VA_START			
+//	add	sp, x0, #LOW_MEMORY
+
+	adrp	x0, __pt_dir_start				
+	msr	ttbr1_el1, x0
+	msr	ttbr0_el1, x0
+
+	ldr	x0, =(TCR_VALUE)		
+	msr	tcr_el1, x0
+
+	ldr	x0, =(MAIR_VALUE)
+	msr	mair_el1, x0
+    ISB
+
+	ldr	x2, =el1_main
+    mrs x0, sctlr_el1
+	orr	x0, x0, #1	// turn on			
+	msr	sctlr_el1, x0
+    ISB
+
+    br x2

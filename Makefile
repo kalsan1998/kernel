@@ -4,9 +4,11 @@ CFLAGS= \
 	-ffreestanding \
 	-nostartfiles \
 	-O2 \
-	-I $(INCLUDE_DIR)
+	-I $(INCLUDE_DIR) \
+
 ASMFLAGS= \
-	-I $(INCLUDE_DIR)
+	-I $(INCLUDE_DIR) \
+	-D ASSEMBLER \
 
 LINKER=./linker.ld
 
@@ -27,6 +29,7 @@ OBJ_ASM:=$(ASM:$(ASM_DIR)/%.S=$(ASM_OBJ_DIR)/%.o)
 kernel: $(OBJ) $(OBJ_ASM)
 	$(GNU)-gcc $(CFLAGS) $^ -T $(LINKER) -o $(OUT_DIR)/client_kernel.elf
 	$(GNU)-objcopy $(OUT_DIR)/client_kernel.elf -O binary $(OUT_DIR)/client_kernel.img
+	$(GNU)-objdump -S $(OUT_DIR)/client_kernel.elf > $(OUT_DIR)/kernel_dump.disasm
 
 .PHONY: boot
 boot:

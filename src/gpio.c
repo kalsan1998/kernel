@@ -2,6 +2,7 @@
 
 #include "utils.h"
 
+// TODO: use DEVICE_MEMORY_START from mm.h
 #define GPIO_BASE 0xfe200000
 
 #define GPFSEL0 0xfe200000

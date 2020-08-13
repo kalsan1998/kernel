@@ -53,7 +53,7 @@ void handle_exception(uint64_t lr)
     print_string("\r\n");
 
     print_string("lr: ");
-    print_hex(lr, 8);
+    print_hex(lr, 16);
     print_string("\r\n");
 
     print_current_exception_level();
@@ -63,11 +63,11 @@ void handle_exception(uint64_t lr)
     int fault_status = fault_status_code_el1();
 
     print_string("Instruction Address: ");
-    print_hex(instruction_address, 8);
+    print_hex(instruction_address, 16);
     print_string("\r\n");
 
     print_string("Fault Address: ");
-    print_hex(fault_address, 8);
+    print_hex(fault_address, 16);
     print_string("\r\n");
 
     print_string("Exception Class: ");
@@ -115,6 +115,8 @@ void handle_exception(uint64_t lr)
         print_string("Not Handled\r\n");
     }
     print_string("--------\r\n");
+    while (1)
+        ;
 }
 
 void print_current_exception_level(void)

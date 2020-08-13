@@ -1,11 +1,12 @@
 #include "threads.h"
 
+#include "mm.h"
 #include "utils.h"
 #include "stdio.h"
 
-#define THREAD_SPACE_START 0x004000000 // give 4MB for kernel img
+#define THREAD_SPACE_START 0x00400000 // give 4MB for kernel img
 #define MAX_THREADS 3
-#define THREAD_STACK_SIZE 0x1000 // 4KB
+#define THREAD_STACK_SIZE PAGE_SIZE // 4KB
 #define RESERVED_THREAD_SPACE MAX_THREADS *THREAD_STACK_SIZE
 
 extern void new_thread_start(void);
